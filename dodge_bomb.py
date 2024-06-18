@@ -28,12 +28,27 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     return yoko, tate
 
 
+def kokaton_dir(kk_img):
+    """
+    押下されたキーに応じて、rotozoomしたSurfaceを返す辞書を準備する関数
+    """
+    rotozoom_dict = {}
+    rotozoom_dict[(-5, 0)] = pg.transform.rotozoom(kk_img, 0, 1)
+    rotozoom_dict[(-5, -5)] = pg.transform.rotozoom(kk_img, -45, 1)
+    rotozoom_dict[(-5, +5)] = pg.transform.rotozoom(kk_img, 45, 1)
+    rotozoom_dict[(+5, 0)] = pg.transform.rotozoom(pg.transform.flip(kk_img, True, False), 0, 1)
+    rotozoom_dict[(+5, -5)] = pg.transform.rotozoom(pg.transform.flip(kk_img, True, False), 45, 1)
+    rotozoom_dict[(0, -5)] = pg.transform.rotozoom(pg.transform.flip(kk_img, True, False), 90, 1)
+    rotozoom_dict[(+5, +5)] = pg.transform.rotozoom(pg.transform.flip(kk_img, True, False), -45, 1)
+    rotozoom_dict[(0, +5)] = pg.transform.rotozoom(pg.transform.flip(kk_img, True, False), -90, 1)
+    return rotozoom_dict
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")
     kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 2.0)
-    kk_flip_img = pg.transform.flip(kk_img, True, False)  # 反転画像を作成
     kk_rct = kk_img.get_rect()
     kk_rct.center = 900, 400
 
@@ -46,6 +61,7 @@ def main():
     clock = pg.time.Clock()
     tmr = 0
     kokaton = kk_img
+    rotozoom_dict = kokaton_dir(kk_img)
     
     while True:
         for event in pg.event.get():
@@ -63,23 +79,10 @@ def main():
                 sum_mv[0] += v[0]
                 sum_mv[1] += v[1]
         
-        if sum_mv==[-5,0]:
+        if tuple(sum_mv) in rotozoom_dict:
+            kokaton = rotozoom_dict[tuple(sum_mv)]
+        else:
             kokaton = kk_img
-        elif sum_mv==[-5,-5]:
-            kokaton = pg.transform.rotozoom(kk_img,-45,1)
-        elif sum_mv==[-5, +5]:
-            kokaton = pg.transform.rotozoom(kk_img,45,1)
-        elif sum_mv==[+5, 0]:
-            kokaton = kk_flip_img
-        elif sum_mv==[+5, -5]:
-            kokaton = pg.transform.rotozoom(kk_flip_img,45,1)
-        elif sum_mv==[0, -5]:
-            kokaton = pg.transform.rotozoom(kk_flip_img,90,1)
-        elif sum_mv==[+5, +5]:
-            kokaton = pg.transform.rotozoom(kk_flip_img,-45,1)
-        elif sum_mv==[0, +5]:
-            kokaton = pg.transform.rotozoom(kk_flip_img,-90,1)
-            
 
         kk_rct.move_ip(sum_mv)
 
