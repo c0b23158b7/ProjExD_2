@@ -53,6 +53,7 @@ def main():
     kk_rct.center = 900, 400
 
     bb_img = pg.Surface((20, 20))  # 1辺が20の空のSurfaceを作る
+    bb_img.set_colorkey((0, 0, 0))
     pg.draw.circle(bb_img, (255, 0, 0), (10, 10), 10)  # 空のSurfaceに赤い円を描く
     bb_rct = bb_img.get_rect()  # 爆弾Rect
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT)
